@@ -23,4 +23,4 @@ Contributors:
   - Sangmin Lee
   - Tony Lin
   - Junyi Wang
-  - TianYu Zhang
+  - Tianyu Zhang
