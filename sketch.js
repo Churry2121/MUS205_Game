@@ -1,10 +1,11 @@
 let player;
-let platforms = [];
+let platforms;
 let jumpKey = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   player = new Player();
+  platforms = new Platforms(200, 200, 100, 50);
 }
 
 function draw() {
@@ -16,6 +17,10 @@ function draw() {
   player.playerMovement();
   player.jump();  // Add this - needs to run every frame
 
+  //updating platform class.
+  platforms.display();
+
+  platforms.update();
   player.update();
 }
 
@@ -42,7 +47,7 @@ class Player{
     this.y = height - 15;
     this.color = color('#a83275');
     this.size = 80;
-    this.ground_level = height - 50;
+    this.ground_level = height - 40;
 
     this.velocityX = 15;
     this.velocityY = 0;
