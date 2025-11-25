@@ -1,16 +1,18 @@
 class Player {
-  constructor(sheet, x, y, scl) {
-    this.sheet = sheet;
+  constructor(framesRight, framesLeft, jumpRight, jumpLeft, x, y, scl) {
+    this.framesRight = framesRight;
+    this.framesLeft = framesLeft;
+    this.jumpRight = jumpRight;
+    this.jumpLeft = jumpLeft;
+
     this.x = x;
     this.y = y;
-    this.color = color('#a83275');
-    this.size = 80;
-    this.ground_level = height - 100;
     this.scl = scl;
 
-    this.h = sheet.height; // Frame width and height
     this.frame = 0;
-    this.total_frames = sheet.width / sheet.height; // Number of frames in your sprite sheet
+    this.total_frames_idle = framesRight.length;
+    this.total_frames_jump = jumpRight.length;
+    this.direction = 1; // 1 = right, -1 = left
 
     this.velocityX = 12;
     this.velocityY = 0;
@@ -19,24 +21,11 @@ class Player {
     this.is_jumping = false;
     this.jump_power = -28;
     this.isGrounded = false;
-  }
-
-  idleAnimation(){
-    image(this.sheet, this.x, this.y, this.h * this.scl, this.h * this.scl, 
-      this.h * floor(this.frame), 0, this.h, this.h);
-
-    this.frame += 0.15; //changing frames
-    if (this.frame >= this.total_frames) {
-      this.frame = 0;
-    }
-  }
-
-  draw() {
-    this.idleAnimation();
+    this.ground_level = height - 150; // Match platform height
+    this.lastAnimationState = null; // Track animation state
   }
 
   update() {
-    //applying gravity
     this.velocityY += this.gravity;
     this.y += this.velocityY;
 
@@ -46,12 +35,50 @@ class Player {
     this.draw();
   }
 
-  checkEdges() {
-    if (this.x > width - 25) {
-      this.x = width - 25;
-    } else if (this.x < 25) {
-      this.x = 25;
+  draw() {
+    let currentState = this.is_jumping ? 'jump' : 'idle';
+    
+    // Reset frame when animation state changes
+    if (currentState !== this.lastAnimationState) {
+      this.frame = 0;
+      this.lastAnimationState = currentState;
     }
+
+    if (this.is_jumping) {
+      this.jumpAnimation();
+    }
+    else {
+      this.idleAnimation();
+    }
+  }
+
+  idleAnimation() {
+    let frames = this.direction === 1 ? this.framesRight : this.framesLeft;
+    let img = frames[floor(this.frame)];
+    let displaySize = img.height * this.scl;
+    image(img, this.x, this.y, displaySize * 1.5, displaySize);
+
+    this.frame += 0.2;
+    if (this.frame >= this.total_frames_idle) {
+      this.frame = 0;
+    }
+  }
+
+  jumpAnimation(){
+    let frames = this.direction === 1 ? this.jumpRight : this.jumpLeft;
+    let img = frames[floor(this.frame)];
+    let displaySize = img.height * this.scl;
+    image(img, this.x, this.y, displaySize * 1.5, displaySize);
+
+    this.frame += 0.2;
+    if(this.frame >= this.total_frames_jump){
+      this.frame = 0;
+    }
+  }
+
+  checkEdges() {
+    if (this.x > width - 25) this.x = width - 25;
+    else if (this.x < 25) this.x = 25;
 
     if (this.y > this.ground_level) {
       this.y = this.ground_level;
@@ -64,14 +91,15 @@ class Player {
   }
 
   playerMovement() {
-    if (keyIsDown(65) === true) { // key A
+    // Check for left movement
+    if (keyIsDown(65) || keyIsDown(97)) { // A or a
       this.x -= this.velocityX;
+      this.direction = -1; // face left
     }
-    if (keyIsDown(68) === true) { // key D
+    // Check for right movement
+    if (keyIsDown(68) || keyIsDown(100)) { // D or d
       this.x += this.velocityX;
-    }
-    if (keyIsDown(83) === true) { // key S
-      this.y += this.velocityX;
+      this.direction = 1; // face right
     }
   }
 
@@ -89,17 +117,6 @@ class Player {
       this.velocityY = this.jump_power;
       jumpKey = false;
     }
-
-    // if (this.is_jumping) {
-    //   this.velocityY += this.gravity;
-
-    //   if (this.y >= this.ground_level) {
-    //     this.y = this.ground_level;
-    //     this.isGrounded = true;
-    //     this.is_jumping = false;
-    //     this.velocityY = 0;
-    //   }
-    // }
   }
 }
 
