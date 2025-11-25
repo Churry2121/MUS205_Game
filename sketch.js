@@ -4,7 +4,7 @@ let jumpKey = false;
 let coin, coinImg;
 
 function preload() {
-  playerImg = loadImage('asset/NightBorne/NightBorne_idle.gif');
+  playerImg = loadImage('asset/knight_3_idle.png');
   coin = loadImage('asset/coin.png');
 }
 
@@ -18,16 +18,10 @@ function setup() {
 function draw() {
   background(150);
 
-  // Update player physics first
-  player.update();
-  player.checkEdges();
-  player.playerMovement();
-  player.jump();
-
   // Display everything
   platforms.display();
-  player.display();
   coinImg.draw();
+  player.update();
 }
 
 function windowResize() {
