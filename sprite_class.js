@@ -1,46 +1,63 @@
 class Player {
-  constructor(gifPath, x, y, scl) {
-    this.gifPath = gifPath;
+  constructor(sheet, x, y, scl) {
+    this.sheet = sheet;
     this.x = x;
     this.y = y;
     this.color = color('#a83275');
     this.size = 80;
-    this.ground_level = height - 40;
+    this.ground_level = height - 100;
     this.scl = scl;
-    this.h = 80; // Adjust based on your sprite
 
+    this.h = sheet.height; // Frame width and height
     this.frame = 0;
-    this.total_frames = 4; // Adjust based on your sprite sheet
+    this.total_frames = sheet.width / sheet.height; // Number of frames in your sprite sheet
 
-    this.velocityX = 15;
+    this.velocityX = 12;
     this.velocityY = 0;
-    this.gravity = 0.6;
+    this.gravity = 2;
 
     this.is_jumping = false;
-    this.jump_power = -15;
+    this.jump_power = -28;
     this.isGrounded = false;
   }
 
-  display() {
-    image(this.gifPath, this.x, this.y, this.h * this.scl, this.h * this.scl);
+  idleAnimation(){
+    image(this.sheet, this.x, this.y, this.h * this.scl, this.h * this.scl, 
+      this.h * floor(this.frame), 0, this.h, this.h);
+
+    this.frame += 0.15; //changing frames
+    if (this.frame >= this.total_frames) {
+      this.frame = 0;
+    }
+  }
+
+  draw() {
+    this.idleAnimation();
   }
 
   update() {
+    //applying gravity
     this.velocityY += this.gravity;
     this.y += this.velocityY;
+
+    this.checkEdges();
+    this.playerMovement();
+    this.jump();
+    this.draw();
   }
 
   checkEdges() {
-    if (this.x > width - 50) {
-      this.x = width - 50;
-    } else if (this.x < 50) {
-      this.x = 50;
+    if (this.x > width - 25) {
+      this.x = width - 25;
+    } else if (this.x < 25) {
+      this.x = 25;
     }
 
     if (this.y > this.ground_level) {
       this.y = this.ground_level;
       this.isGrounded = true;
       this.velocityY = 0;
+      this.is_jumping = false;
     } else if (this.y < 50) {
       this.y = 50;
     }
@@ -59,27 +76,30 @@ class Player {
   }
 
   jump() {
-    if (this.y === this.ground_level) {
+    if (this.y >= this.ground_level) {
+      this.y = this.ground_level;
       this.isGrounded = true;
+      this.is_jumping = false;
+      this.velocityY = 0;
     }
 
-    if (jumpKey && !this.is_jumping && this.isGrounded) {
+    if (jumpKey && this.isGrounded) {
       this.is_jumping = true;
-      this.velocityY = this.jump_power; // Use velocityY, not velocity
+      this.isGrounded = false;
+      this.velocityY = this.jump_power;
       jumpKey = false;
     }
 
-    if (this.is_jumping) {
-      this.y += this.velocityY;
-      this.velocityY += this.gravity;
+    // if (this.is_jumping) {
+    //   this.velocityY += this.gravity;
 
-      if (this.y >= this.ground_level) {
-        this.y = this.ground_level;
-        this.isGrounded = true;
-        this.is_jumping = false;
-        this.velocityY = 0;
-      }
-    }
+    //   if (this.y >= this.ground_level) {
+    //     this.y = this.ground_level;
+    //     this.isGrounded = true;
+    //     this.is_jumping = false;
+    //     this.velocityY = 0;
+    //   }
+    // }
   }
 }
 
