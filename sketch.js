@@ -1,15 +1,23 @@
 let player;
 let platforms;
 let jumpKey = false;
+let coin, coinImg;
+
+function preload(){
+  coin = loadImage('asset/coin.png');
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   player = new Player();
   platforms = new Platforms(200, 200, 100, 50);
+  coinImg = new Coin(coin, 75, 100, 2);
 }
 
 function draw() {
   background(150);
+
+  coinImg.draw();
 
   //updating player class.
   player.display();
