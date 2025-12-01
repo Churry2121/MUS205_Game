@@ -1,4 +1,4 @@
-let player, totalFrames = 0;
+let player;
 let playerFramesIdle1 = [], playerFramesIdle2 = [];
 let playerFramesJump1 = [], playerFramesJump2 = [];
 let playerFramesRun = [], playerFramesRun2 = []
