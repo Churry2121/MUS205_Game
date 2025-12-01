@@ -2,7 +2,7 @@ let player;
 let playerFramesIdle1 = [], playerFramesIdle2 = [];
 let playerFramesJump1 = [], playerFramesJump2 = [];
 let playerFramesRun = [], playerFramesRun2 = []
-let platforms;
+let platforms = [];
 let jumpKey = false;
 let coin, coinImg;
 
@@ -33,11 +33,17 @@ function preload() {
 
 function setup() {
   createCanvas(1880, windowHeight);
+
+  platforms = [
+    new Platforms(0, height - 50, width, 50),
+    new Platforms(400, height - 150, 200, 30),
+    new Platforms(800, height - 200, 200, 30)
+  ];
+
   player = new Player(playerFramesIdle1, playerFramesIdle2, 
     playerFramesJump1, playerFramesJump2, 
-    playerFramesRun, playerFramesRun2, 
-    250, 250, 3);
-  platforms = new Platforms(0, height - 50, width, 50); 
+    playerFramesRun, playerFramesRun2, 250, 250, 3, platforms);
+
   coinImg = new Coin(coin, 75, 100, 2.15);
 }
 
@@ -45,7 +51,10 @@ function draw() {
   background(150);
 
   // Display everything
-  platforms.display();
+  for (let platform of platforms){
+    platform.display();
+  }
+
   coinImg.draw();
   player.update();
 }
