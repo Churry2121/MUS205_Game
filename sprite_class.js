@@ -19,9 +19,9 @@ class Player {
     this.gravity = 2;
 
     this.is_jumping = false;
-    this.jump_power = -28;
+    this.jump_power = -28.5;
     this.isGrounded = false;
-    this.ground_level = height - 150; // Match platform height
+    this.ground_level = height - 45; // Match platform height
     this.lastAnimationState = null; // Track animation state
   }
 
@@ -39,7 +39,7 @@ class Player {
     let currentState = this.is_jumping ? 'jump' : 'idle';
     
     // Reset frame when animation state changes
-    if (currentState !== this.lastAnimationState) {
+    if (currentState != this.lastAnimationState) {
       this.frame = 0;
       this.lastAnimationState = currentState;
     }
@@ -56,9 +56,11 @@ class Player {
     let frames = this.direction === 1 ? this.framesRight : this.framesLeft;
     let img = frames[floor(this.frame)];
     let displaySize = img.height * this.scl;
-    image(img, this.x, this.y, displaySize * 1.5, displaySize);
 
-    this.frame += 0.2;
+    //draw image with pivot at bottom: subtract height from y position
+    image(img, this.x, this.y - displaySize, displaySize * 1.5, displaySize);
+
+    this.frame += 0.15;
     if (this.frame >= this.total_frames_idle) {
       this.frame = 0;
     }
@@ -68,26 +70,28 @@ class Player {
     let frames = this.direction === 1 ? this.jumpRight : this.jumpLeft;
     let img = frames[floor(this.frame)];
     let displaySize = img.height * this.scl;
-    image(img, this.x, this.y, displaySize * 1.5, displaySize);
+    image(img, this.x, this.y - displaySize, displaySize * 1.5, displaySize);
 
-    this.frame += 0.2;
+    this.frame += 0.15;
     if(this.frame >= this.total_frames_jump){
       this.frame = 0;
     }
   }
 
   checkEdges() {
-    if (this.x > width - 25) this.x = width - 25;
-    else if (this.x < 25) this.x = 25;
-
-    if (this.y > this.ground_level) {
-      this.y = this.ground_level;
-      this.isGrounded = true;
-      this.velocityY = 0;
-      this.is_jumping = false;
-    } else if (this.y < 50) {
-      this.y = 50;
+    if (this.x > 1800){
+      this.x = 1800;
+    } else if (this.x < -80) {
+      this.x = -80;
     }
+    // if (this.y > this.ground_level) {
+    //   this.y = this.ground_level;
+    //   this.isGrounded = true;
+    //   this.velocityY = 0;
+    //   this.is_jumping = false;
+    // } else if (this.y < 50) {
+    //   this.y = 50;
+    // }
   }
 
   playerMovement() {
@@ -122,11 +126,11 @@ class Player {
 
 /******************************************************************************************************** */
 class Platforms {
-  constructor(x, y, length, width) {
+  constructor(x, y, w, h) {
     this.x = x || 0;
-    this.y = y || height - 50;
-    this.length = length || width;
-    this.width = width || 20;
+    this.y = y || h - 50;
+    this.length = length || w;
+    this.width = w || 20;
   }
 
   display() {
