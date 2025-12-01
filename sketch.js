@@ -4,6 +4,7 @@ let playerFramesJump1 = [], playerFramesJump2 = [];
 let platforms;
 let jumpKey = false;
 let coin, coinImg;
+let platformGroup;
 
 function preload() {
   for (let i = 0; i < 8; i++){
@@ -28,10 +29,11 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  player = new Player(playerFramesIdle1, playerFramesIdle2, playerFramesJump1, playerFramesJump2, 250, 250, 2);
-  platforms = new Platforms(0, height - 50, width, 50);
-  coinImg = new Coin(coin, 75, 100, 2);
+  createCanvas(1880, windowHeight);
+  player = new Player(playerFramesIdle1, playerFramesIdle2, playerFramesJump1, playerFramesJump2, 250, 250, 3, 'dynamic');
+  //KINEMATIC COLLIDER - moves programmatically, ignores physics; allows the player sprite to step on top of the platform w/o falling through
+  platforms = new Platforms(0, height - 50, width, 50, 'kinematic'); 
+  coinImg = new Coin(coin, 75, 100, 2.15, 'static');
 }
 
 function draw() {
