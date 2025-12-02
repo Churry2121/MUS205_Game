@@ -1,5 +1,5 @@
 class Player {
-  constructor(framesRight, framesLeft, jumpRight, jumpLeft, runRight, runLeft, x, y, scl, platform) {
+  constructor(framesRight, framesLeft, jumpRight, jumpLeft, runRight, runLeft, x, y, scl) {
     this.framesRight = framesRight;
     this.framesLeft = framesLeft;
     this.jumpRight = jumpRight;
@@ -10,6 +10,8 @@ class Player {
     this.x = x;
     this.y = y;
     this.scl = scl;
+    this.w = framesRight[0].width * (this.scl % 2) + 15;
+    this.h = framesRight[0].height * this.scl;
 
     this.frame = 0;
     this.total_frames_idle = framesRight.length;
@@ -21,8 +23,6 @@ class Player {
     this.velocityY = 0;
     this.gravity = 2;
 
-    this.platforms = platform; //platforms = []
-
     this.is_jumping = false;
     this.jump_power = -28.5;
     this.isGrounded = false;
@@ -30,14 +30,33 @@ class Player {
     this.lastAnimationState = null; // Track animation state
   }
 
-  update() {
+  update(platforms) {
     this.velocityY += this.gravity;
     this.y += this.velocityY;
 
+    this.isGrounded = false;
+
+    for (let p of platforms){ //check collision with all platforms in the array
+      this.checkPlatformCollision(p);
+    }
+
+    if (this.y >= this.ground_level){ //fallback ground collision
+      this.y = this.ground_level;
+      this.isGrounded = true;
+      this.is_jumping = false;
+      this.velocityY = 0;
+    }
+     
     this.checkEdges();
     this.playerMovement();
     this.jump();
     this.draw();
+  }
+
+  checkPlatformCollision(platform){
+    if ((this.x + this.w) > platform.w){
+      console.log('collision');
+    }
   }
 
   draw() {
@@ -51,7 +70,7 @@ class Player {
       currentState = 'idle';
     }
 
-    //reset frame when animation state changes BEFORE drawing
+    //reset frame when animation state changes before drawing
     if (currentState !== this.lastAnimationState) {
       this.frame = 0;
       this.lastAnimationState = currentState;
@@ -111,20 +130,14 @@ class Player {
     } else if (this.x < -80) {
       this.x = -80;
     }
-    
-    // Check platform collision
-    this.isGrounded = false;
-    for (let platform of this.platforms) {
-      if (platform.checkCollision(this)) {
-        let playerHeight = this.framesRight[0].height * this.scl;
-        this.y = platform.y - playerHeight;
-        this.isGrounded = true;
-        this.velocityY = 0;
-        this.is_jumping = false;
-        break; // Stop checking once we find a platform
-      }
+
+    if (this.y >= this.ground_level) {
+      this.y = this.ground_level;
+      this.isGrounded = true;
+      this.is_jumping = false;
+      this.velocityY = 0;
     }
-    
+
     //upper bound
     if (this.y < 50) {
       this.y = 50;
@@ -149,12 +162,12 @@ class Player {
   }
 
   jump() {
-    if (this.y >= this.ground_level) {
-      this.y = this.ground_level;
-      this.isGrounded = true;
-      this.is_jumping = false;
-      this.velocityY = 0;
-    }
+    // if (this.y >= this.platforms.y) {
+    //   this.y = this.platforms.y;
+    //   this.isGrounded = true;
+    //   this.is_jumping = false;
+    //   this.velocityY = 0;
+    // }
 
     if (jumpKey && this.isGrounded) {
       this.is_jumping = true;
@@ -175,31 +188,12 @@ class Platforms {
   }
 
   display() {
-    fill(0);
+    fill(150, 100, 50);
     rect(this.x, this.y, this.w, this.h);
   }
 
   update() {
     //platform logic here
-  }
-
-  checkCollision(player){
-    let playerWidth = player.framesRight[0].width * player.scl * 1.5;
-    let playerHeight = player.framesRight[0].length * player.scl;
-    
-    let playerLeft = player.x;
-    let playerRight = player.x + playerWidth;
-    let playerTop = player.y;
-    let playerBottom = player.y + playerHeight;
-
-    let horizontalOverlap = playerRight > this.x && playerLeft < this.x + this.w; //check horizontal overlap
-    
-    //check if player is falling and near the platform top
-    let verticalOverlap = playerBottom >= this.y && 
-                         playerTop <= this.y + this.h && 
-                         player.velocityY >= 0;
-    
-    return horizontalOverlap && verticalOverlap;
   }
 }
 
@@ -224,3 +218,42 @@ class Coin {
     }
   }
 }
+
+  // checkPlatformCollision(platform){
+  //   //AABB collision detection
+  //   //if all conditions are true, then there is a collision
+  //   if (this.x < platform.x + platform.w && //player's left edge is left of platform's right edge
+  //       this.x + this.w > platform.x && //player's right edge is right of platform's left edge
+  //       this.y < platform.y + platform.h && //player's top edge is above platform's bottom edge
+  //       this.y + this.h > platform.y){ //player's bottom edge is below platform's top edge
+
+  //     // Determine collision side based on velocity and position
+  //     let overlapLeft = (this.x + this.w) - platform.x; //Measures distance from player's right edge to platform's left edge.
+  //     let overlapRight = (platform.x + platform.w) - this.x; //measures distance from platform's right edge to player's left edge.
+  //     let overlapTop = (this.y + this.h) - platform.y; //Measures distance from player's bottom to platform's top.
+  //     let overlapBottom = (platform.y + platform.h) - this.y; //Measures distance from platform's bottom to player's top.
+
+  //     // Find minimum overlap to determine collision side. We use the smallest because that's the most recent collision.
+  //     let minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+  //     let tolerance = 5;
+      
+  //     // Resolve collision based on which side has minimum overlap
+  //     if (minOverlap === overlapTop && this.velocityY > 0) { //if the most recent overlap is the top of the platform, and the player is falling
+  //       // Landing on top of platform
+  //       this.y = platform.y - this.h;
+  //       this.velocityY = 0;
+  //       this.isGrounded = true;
+  //       this.is_jumping = false;
+  //     } else if (minOverlap === overlapBottom && this.velocityY < 0) {
+  //       // Hit bottom of platform
+  //       this.y = platform.y - platform.h;
+  //       this.velocityY = 0;
+  //     } else if (minOverlap === overlapLeft) {
+  //       // Hit from right side
+  //       this.x = platform.x - this.w;
+  //     } else if (minOverlap === overlapRight) {
+  //       // Hit from left side
+  //       this.x = platform.x + platform.w;
+  //     }    
+  //   }
+  // }
