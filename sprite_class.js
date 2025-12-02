@@ -1,11 +1,13 @@
 class Player {
-  constructor(framesRight, framesLeft, jumpRight, jumpLeft, runRight, runLeft, x, y, scl) {
+  constructor(framesRight, framesLeft, jumpRight, jumpLeft, runRight, runLeft, attackRight1, attackLeft1, x, y, scl) {
     this.framesRight = framesRight;
     this.framesLeft = framesLeft;
     this.jumpRight = jumpRight;
     this.jumpLeft = jumpLeft;
     this.runRight = runRight;
     this.runLeft = runLeft;
+    this.attackRight1 = attackRight1;
+    this.attackLeft1 = attackLeft1;
 
     this.x = x;
     this.y = y;
@@ -161,19 +163,19 @@ class Player {
     }
   }
 
+  attackAnimation(){
+    let frames = this.direction === 1 ? this.attackRight1 : this.attackLeft1; //if this.direction is 1, then face right, else face left
+    let img = frames[floor(this.frame)];
+    let displaySize = img.height * this.scl;
+    image(img, this.x, this.y, displaySize * 1.5, displaySize);
+  }
+
   checkEdges() {
     // Horizontal bounds
     if (this.x > 1800) {
       this.x = 1800;
     } else if (this.x < -80) {
       this.x = -80;
-    }
-
-    if (this.y >= this.ground_level) {
-      this.y = this.ground_level;
-      this.isGrounded = true;
-      this.is_jumping = false;
-      this.velocityY = 0;
     }
 
     //upper bound
@@ -200,13 +202,6 @@ class Player {
   }
 
   jump() {
-    // if (this.y >= this.platforms.y) {
-    //   this.y = this.platforms.y;
-    //   this.isGrounded = true;
-    //   this.is_jumping = false;
-    //   this.velocityY = 0;
-    // }
-
     if (jumpKey && this.isGrounded) {
       this.is_jumping = true;
       this.isGrounded = false;
