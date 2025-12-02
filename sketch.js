@@ -1,7 +1,8 @@
 let player;
 let playerFramesIdle1 = [], playerFramesIdle2 = [];
 let playerFramesJump1 = [], playerFramesJump2 = [];
-let playerFramesRun = [], playerFramesRun2 = []
+let playerFramesRun = [], playerFramesRun2 = [];
+let playerFramesAttack = [], playerFramesAttack2 = [];
 let platforms = [];
 let jumpKey = false;
 let coin, coinImg;
@@ -28,6 +29,13 @@ function preload() {
     playerFramesRun2[i] = loadImage(`asset/Run_2/HeroKnight_Run_${i}.png`);
   }
 
+  for (let i = 0; i < 5; i++){
+    playerFramesAttack[i] = loadImage(`asset/Attack1/HeroKnight_Attack1_${i}.png`);
+  }
+  for (let i = 0; i < 5; i++){
+    playerFramesAttack2[i] = loadImage(`asset/Attack1_2/HeroKnight_Attack1_${i}.png`);
+  }
+
   coin = loadImage('asset/coin.png');
 }
 
@@ -36,11 +44,14 @@ function setup() {
 
   player = new Player(playerFramesIdle1, playerFramesIdle2, 
     playerFramesJump1, playerFramesJump2, 
-    playerFramesRun, playerFramesRun2, 50, 250, 3);
+    playerFramesRun, playerFramesRun2, 
+    playerFramesAttack, playerFramesAttack2,
+    50, 250, 3);
 
   platforms.push(new Platforms(0, height - 50, width, 50));
   platforms.push(new Platforms(350, height - 150, 300, 30));
-  platforms.push(new Platforms(800, 800, 550, 30));
+  platforms.push(new Platforms(800, 800, 300, 30));
+  platforms.push(new Platforms(350, height - 450, 300, 30));
 
   coinImg = new Coin(coin, 75, 100, 2.15);
 }
