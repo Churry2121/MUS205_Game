@@ -10,8 +10,16 @@ class Player {
     this.x = x;
     this.y = y;
     this.scl = scl;
-    this.w = framesRight[0].width * (this.scl % 2) + 15;
-    this.h = framesRight[0].height * this.scl;
+
+    let baseHeight = framesLeft[0].height * this.scl;
+    this.w = baseHeight * 1.5;
+    this.h = baseHeight;
+
+    // Add collision box offsets (adjust these values to fit your sprite)
+    this.collisionOffsetX = this.w * 0.3;  // Offset from left edge
+    this.collisionOffsetY = this.h * 0.1;  // Offset from top edge
+    this.collisionWidth = this.w * 0.4;    // Actual collision box width
+    this.collisionHeight = this.h * 0.8;   // Actual collision box height
 
     this.frame = 0;
     this.total_frames_idle = framesRight.length;
@@ -53,9 +61,39 @@ class Player {
     this.draw();
   }
 
-  checkPlatformCollision(platform){
-    if ((this.x + this.w) > platform.w){
-      console.log('collision');
+  checkPlatformCollision(platform) {
+    // Calculate actual collision box position
+    let collisionX = this.x + this.collisionOffsetX;
+    let collisionY = this.y + this.collisionOffsetY;
+    
+    // AABB collision detection with adjusted collision box
+    if (collisionX < platform.x + platform.w &&
+        collisionX + this.collisionWidth > platform.x &&
+        collisionY < platform.y + platform.h &&
+        collisionY + this.collisionHeight > platform.y) {
+
+      // Calculate overlaps using collision box
+      let overlapLeft = (collisionX + this.collisionWidth) - platform.x;
+      let overlapRight = (platform.x + platform.w) - collisionX;
+      let overlapTop = (collisionY + this.collisionHeight) - platform.y;
+      let overlapBottom = (platform.y + platform.h) - collisionY;
+
+      let minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+      
+      if (minOverlap === overlapTop && this.velocityY > 0) {
+        // Landing on top - adjust main position, not collision box position
+        this.y = platform.y - this.collisionOffsetY - this.collisionHeight;
+        this.velocityY = 0;
+        this.isGrounded = true;
+        this.is_jumping = false;
+      } else if (minOverlap === overlapBottom && this.velocityY < 0) {
+        this.y = platform.y + platform.h - this.collisionOffsetY;
+        this.velocityY = 0;
+      } else if (minOverlap === overlapLeft) {
+        this.x = platform.x - this.collisionOffsetX - this.collisionWidth;
+      } else if (minOverlap === overlapRight) {
+        this.x = platform.x + platform.w - this.collisionOffsetX;
+      }    
     }
   }
 
