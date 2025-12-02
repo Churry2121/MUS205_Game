@@ -1,3 +1,4 @@
+
 let player;
 let playerFramesIdle1 = [], playerFramesIdle2 = [];
 let playerFramesJump1 = [], playerFramesJump2 = [];
@@ -6,7 +7,7 @@ let playerFramesAttack = [], playerFramesAttack2 = [];
 let platforms = [];
 let jumpKey = false;
 let coin, coinImg;
-let bg, gameFont;
+let bg, gameFont, camX;
 
 
 function preload() {
@@ -68,12 +69,20 @@ function draw() {
   textSize(18);
   text(`x: ${mouseX} y: ${mouseY}`, 10, 25);
 
+  camX = width / 10 - player.x; //calculating the required camera shift. This offsets the world so the player remains visually centered or fixed.
+
+  //apply camX using translate()
+  push();
+  translate(camX, 0);
+  
+  player.update(platforms);
+
   for (let p of platforms){ //show platforms
     p.display();
   }
   
   coinImg.draw();
-  player.update(platforms);
+  pop();
 }
 
 function windowResize() {
