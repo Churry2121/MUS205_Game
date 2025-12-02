@@ -34,15 +34,13 @@ function preload() {
 function setup() {
   createCanvas(1880, windowHeight);
 
-  platforms = [
-    new Platforms(0, height - 50, width, 50),
-    new Platforms(400, height - 150, 200, 30),
-    new Platforms(800, height - 200, 200, 30)
-  ];
-
   player = new Player(playerFramesIdle1, playerFramesIdle2, 
     playerFramesJump1, playerFramesJump2, 
-    playerFramesRun, playerFramesRun2, 250, 250, 3, platforms);
+    playerFramesRun, playerFramesRun2, 50, 250, 3);
+
+  platforms.push(new Platforms(0, height - 50, width, 50));
+  platforms.push(new Platforms(350, height - 150, 300, 30));
+  platforms.push(new Platforms(750, 800, 550, 30));
 
   coinImg = new Coin(coin, 75, 100, 2.15);
 }
@@ -50,13 +48,12 @@ function setup() {
 function draw() {
   background(150);
 
-  // Display everything
-  for (let platform of platforms){
-    platform.display();
+  for (let p of platforms){ //show platforms
+    p.display();
   }
-
+  
   coinImg.draw();
-  player.update();
+  player.update(platforms);
 }
 
 function windowResize() {
