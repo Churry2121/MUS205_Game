@@ -40,7 +40,7 @@ function setup() {
 
   platforms.push(new Platforms(0, height - 50, width, 50));
   platforms.push(new Platforms(350, height - 150, 300, 30));
-  platforms.push(new Platforms(750, 800, 550, 30));
+  platforms.push(new Platforms(800, 800, 550, 30));
 
   coinImg = new Coin(coin, 75, 100, 2.15);
 }
