@@ -1,4 +1,3 @@
-
 let player;
 let playerFramesIdle1 = [], playerFramesIdle2 = [];
 let playerFramesJump1 = [], playerFramesJump2 = [];
@@ -8,6 +7,17 @@ let platforms = [];
 let jumpKey = false;
 let coin, coinImg;
 let bg, gameFont, camX;
+let tileset;
+const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
+const TILE_SIZE_H_SOURCE = 16;
+
+// Destination Size (The size you want it to appear on the canvas)
+const TILE_SCALE = 2; // Scale factor (e.g., 2 for double size)
+const TILE_SIZE_W_DEST = TILE_SIZE_W_SOURCE * TILE_SCALE * 1.5; // 32 * 2 = 64
+const PLATFORM_HEIGHT = TILE_SIZE_H_SOURCE * TILE_SCALE * 1.5;   // 16 * 2 = 32
+
+let platformTileX = 16; //X:~64 (where the single blocks start)
+let platformTileY = 48; //Y: ~16 (the start of the second block)
 
 
 function preload() {
@@ -39,6 +49,8 @@ function preload() {
     playerFramesAttack2[i] = loadImage(`asset/Attack1_2/HeroKnight_Attack1_${i}.png`);
   }
 
+  tileset = loadImage('asset/tileset2.png');
+
   bg = loadImage('asset/bg/castle_ruins.jpg');
   coin = loadImage('asset/coin.png');
   gameFont = loadFont('asset/ByteBounce.ttf');
@@ -53,13 +65,12 @@ function setup() {
     playerFramesAttack, playerFramesAttack2,
     50, 10, 3);
 
-  platforms.push(new Platforms(0, 200, 350, 30));
-  platforms.push(new Platforms(350, height - 150, 300, 30));
-  platforms.push(new Platforms(800, 800, 300, 30));
-  platforms.push(new Platforms(350, height - 450, 300, 30));
+  platforms.push(new Platforms(0, 200, 350, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(350, height - 100, 300, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(800, 800, 300, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(350, height - 400, 300, PLATFORM_HEIGHT));
 
-  coinImg = new Coin(coin, 75, 100, 2.15);
-
+  coinImg = new Coin(coin, 75, 100, 2.75);
   textFont(gameFont);
 }
 
