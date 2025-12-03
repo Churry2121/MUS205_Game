@@ -50,45 +50,76 @@ class Coin {
 
 /******************************************************************************************** */
 class Enemy {
-  constructor(sheet, x, y, scl){
+  constructor(sheet, x, y, scl, walkRange=325){
     this.sheet = sheet;
     this.scl = scl;
     this.x = x;
     this.y = y;
-    this.h = sheet.height;
 
-    //the sprite sheet has a dimension of 96x24 with 4 frames
-    this.frameW = 22; //width of one frame (86 / 4 = 21.5)
-    this.frameH = 20; //height of the sprite (36 / 2 = 18)
-    this.cols = 4; //number of cols on the sprite sheet
-    this.rows = 2; //number of rows on the sprite sheet
+    this.velocityX = 1;
+    this.velocityY = 0;
+    this.gravity = 2;
+
+    // Fixed: Assign the parameter to the property
+    this.initialX = x;
+    this.walkRange = walkRange; // This was the bug!
+    this.minX = this.initialX;
+    this.maxX = this.initialX + this.walkRange;
+
+    // Sprite sheet properties
+    this.frameW = 22;
+    this.frameH = 20;
+    this.cols = 4;
+    this.rows = 2;
     this.total_frames = 8;
 
     this.w = this.frameW * this.scl;
     this.h = this.frameH * this.scl;
 
-    this.direction = 1;
+    this.direction = 1; // 1 for right, -1 for left 
     this.frame = 0;
   }
 
   update(){
+    this.x += this.velocityX;
+
+    // Check boundaries and reverse direction
+    if (this.x >= this.maxX){
+      this.velocityX = -abs(this.velocityX);
+      this.direction = -1;
+    }
+    else if (this.x <= this.minX){
+      this.velocityX = abs(this.velocityX);
+      this.direction = 1; 
+    }
+
     this.draw();
   }
 
   draw() {
+    push();
+    
+    // Flip sprite based on direction
+    if (this.direction === -1) {
+      translate(this.x + this.w, this.y);
+      scale(-1, 1);
+      translate(-this.x, -this.y);
+    }
+    
     let currentFrame = floor(this.frame);
-    let col = currentFrame % this.cols; //column index (0-3)
-    let row = floor(currentFrame / this.cols); //row index (0-1)
+    let col = currentFrame % this.cols;
+    let row = floor(currentFrame / this.cols);
 
-    //calculate source x and y positions in the sprite sheet
     let sx = col * this.frameW;
     let sy = row * this.frameH;
 
     image(this.sheet, this.x, this.y, this.w, this.h, 
-          sx, sy, this.frameH, this.frameH);
+          sx, sy, this.frameW, this.frameH);
+
+    pop();
 
     this.frame += 0.08;
-    if (this.frame > this.total_frames) {
+    if (this.frame >= this.total_frames) {
       this.frame = 0;
     }
   }
