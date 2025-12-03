@@ -3,12 +3,22 @@ class Platforms {
     this.x = x;
     this.y = y;
     this.w = w;
-    this.h = h;
+    this.h = PLATFORM_HEIGHT; //platform height is fixed to the tile height
+    this.numTiles = ceil(this.w / TILE_SIZE_W_DEST); //how many tiles wide the platform is 
   }
 
   display() {
-    fill('#7393B3');
-    rect(this.x, this.y, this.w, this.h);
+    //loop for the length of the current platform
+    for (let i = 0; i < this.numTiles; i++){
+      //calculate the where on the canvas it is being drawn
+      let destX = this.x + i * TILE_SIZE_W_DEST;
+      let destY = this.y;
+
+      image(
+        tileset, destX, destY, TILE_SIZE_W_DEST, PLATFORM_HEIGHT,
+        platformTileX, platformTileY, TILE_SIZE_W_SOURCE, TILE_SIZE_H_SOURCE
+      )
+    }
   }
 
   update() {
