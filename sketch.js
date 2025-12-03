@@ -1,14 +1,14 @@
-let player;
+let player, points;
 let playerFramesIdle1 = [], playerFramesIdle2 = [];
 let playerFramesJump1 = [], playerFramesJump2 = [];
 let playerFramesRun = [], playerFramesRun2 = [];
 let playerFramesAttack = [], playerFramesAttack2 = [];
 let platforms = [];
 let jumpKey = false;
-let coin, coinImg;
+let coin, coin1, coin2, coin3, coinImg;
 let bg, gameFont, camX;
 let tileset, enemyImg;
-let enemy;
+let enemy, enemy1, enemy2, enemy3;
 
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
@@ -54,12 +54,14 @@ function preload() {
   tileset = loadImage('asset/tileset2.png');
   enemyImg = loadImage('asset/slime/slime_idlev2.png');
   bg = loadImage('asset/bg/castle_ruins.jpg');
-  coin = loadImage('asset/coin.png');
+  coinImg = loadImage('asset/coin.png');
   gameFont = loadFont('asset/ByteBounce.ttf');
 }
 
 function setup() {
   createCanvas(1880, windowHeight);
+
+  pointSystem();
 
   player = new Player(playerFramesIdle1, playerFramesIdle2, 
     playerFramesJump1, playerFramesJump2, 
@@ -68,13 +70,16 @@ function setup() {
     50, height - 400, 3);
 
   enemy = new Enemy(enemyImg, 800, 765, 2.75);
+  enemy1 = new Enemy(enemyImg, 700, 400, 2.75, 225);
+  enemy2 = new Enemy(enemyImg, 1500, 565, 2.75, 200);
+  enemy3 = new Enemy(enemyImg, 2500, 565, 2.75, 250);
 
   platforms.push(new Platforms(0, height - PLATFORM_HEIGHT, width * 21, PLATFORM_HEIGHT));
-  platforms.push(new Platforms(350, height - 100, 285, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(350, height - 100, 275, PLATFORM_HEIGHT));
   platforms.push(new Platforms(800, 800, 300, PLATFORM_HEIGHT));
   platforms.push(new Platforms(360, height - 450, 185, PLATFORM_HEIGHT));
   platforms.push(new Platforms(700, 430, 200, PLATFORM_HEIGHT));
-  platforms.push(new Platforms(935, 430 - PLATFORM_HEIGHT, 300, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(970, 430 - PLATFORM_HEIGHT, 300, PLATFORM_HEIGHT));
   platforms.push(new Platforms(200, 250, 250, PLATFORM_HEIGHT));
   platforms.push(new Platforms(1500, 600, 240, PLATFORM_HEIGHT));
   platforms.push(new Platforms(2000, 430, 300, PLATFORM_HEIGHT));
@@ -82,15 +87,19 @@ function setup() {
   platforms.push(new Platforms(1750, 350, 100, PLATFORM_HEIGHT));
   platforms.push(new Platforms(1500, 225, 240, PLATFORM_HEIGHT));
 
-  coinImg = new Coin(coin, 75, 100, 2.75);
+  coin = new Coin(coinImg, 325, 200, 2.75);
+  coin1 = new Coin(coinImg, 1250, 325, 2.75);
+  coin2 = new Coin(coinImg, 1675, 165, 2.75);
+  coin3 = new Coin(coinImg, 2100, 375, 2.75);
   textFont(gameFont);
 }
 
 function draw() {
   background(bg);
-  fill(255);
-  textSize(18);
-  text(`x: ${mouseX} y: ${mouseY}`, 10, 25);
+  fill('#964B00');
+  textSize(28);
+  text(`Points: ${points}`, 25, 25);
+  text(`WASD; Hold J to Attack`, 25, 50);
 
   camX = width / 2 - player.x; //calculating the required camera shift. This offsets the world so the player remains visually centered or fixed.
 
@@ -99,14 +108,21 @@ function draw() {
   translate(camX, 0);
   
   player.update(platforms);
+
   enemy.update();
+  enemy1.update();
+  enemy2.update();
+  enemy3.update();
   // enemyMovement();
 
   for (let p of platforms){ //show platforms
     p.display();
   }
   
-  coinImg.draw();
+  coin.draw();
+  coin1.draw();
+  coin2.draw(); 
+  coin3.draw();
   pop();
 }
 
@@ -132,6 +148,10 @@ function keyReleased() {
   if(key === 'j' || key === 'J'){
     player.is_attacking = false; //stops animation when the key is released
   }
+}
+
+function pointSystem(){
+  points = 0
 }
 
 // function enemyMovement(){
