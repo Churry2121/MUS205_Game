@@ -52,9 +52,9 @@ class Player {
       this.checkPlatformCollision(p);
     }
 
-    if (this.y >= height + 200){ //fallback ground collision
+    if (this.y >= height + 200){ //falling through gaps
       this.x = 50;
-      this.y = 90;
+      this.y = height - 400;
       this.isGrounded = true;
       this.is_jumping = false;
       this.velocityY = 0;
@@ -70,18 +70,20 @@ class Player {
     // Calculate actual collision box position
     let collisionX = this.x + this.collisionOffsetX;
     let collisionY = this.y + this.collisionOffsetY;
+    let collisionRight = collisionX + this.collisionWidth;
+    let collisionBottom = collisionY + this.collisionHeight;
     
     // AABB collision detection with adjusted collision box
     if (collisionX < platform.x + platform.w &&
-        collisionX + this.collisionWidth > platform.x &&
+        collisionRight > platform.x &&
         collisionY < platform.y + platform.h &&
-        collisionY + this.collisionHeight > platform.y) {
+        collisionBottom > platform.y) {
 
-      // Calculate overlaps using collision box
-      let overlapLeft = (collisionX + this.collisionWidth) - platform.x;
-      let overlapRight = (platform.x + platform.w) - collisionX;
-      let overlapTop = (collisionY + this.collisionHeight) - platform.y;
-      let overlapBottom = (platform.y + platform.h) - collisionY;
+      // Calculate overlaps using collision box - distance of penetration
+      let overlapLeft = collisionRight - platform.x;  // How far we've penetrated from the left
+      let overlapRight = (platform.x + platform.w) - collisionX;  // How far we've penetrated from the right
+      let overlapTop = collisionBottom - platform.y;  // How far we've penetrated from the top
+      let overlapBottom = (platform.y + platform.h) - collisionY;  // How far we've penetrated from the bottom
 
       let minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
       
@@ -92,11 +94,14 @@ class Player {
         this.isGrounded = true;
         this.is_jumping = false;
       } else if (minOverlap === overlapBottom && this.velocityY < 0) {
+        // Hitting from below
         this.y = platform.y + platform.h - this.collisionOffsetY;
         this.velocityY = 0;
       } else if (minOverlap === overlapLeft) {
+        // Hitting the left side of platform (player moving right)
         this.x = platform.x - this.collisionOffsetX - this.collisionWidth;
       } else if (minOverlap === overlapRight) {
+        // Hitting the right side of platform (player moving left)
         this.x = platform.x + platform.w - this.collisionOffsetX;
       }    
     }
@@ -186,15 +191,15 @@ class Player {
 
   checkEdges() {
     // Horizontal bounds
-    if (this.x > 1800) {
-      this.x = 1800;
-    } else if (this.x < -80) {
-      this.x = -80;
+    if (this.x > 2600) {
+      this.x = 2600;
+    } else if (this.x < 0) {
+      this.x = 0;
     }
 
     //upper bound
-    if (this.y < 50) {
-      this.y = 50;
+    if (this.y < -50) {
+      this.y = -50;
       this.velocityY = 0;
     }
   }
