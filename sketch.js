@@ -64,14 +64,22 @@ function setup() {
     playerFramesJump1, playerFramesJump2, 
     playerFramesRun, playerFramesRun2, 
     playerFramesAttack, playerFramesAttack2,
-    50, 10, 3);
+    50, height - 400, 3);
 
   enemy = new Enemy(enemyImg, 400, 400, 2.5);
 
-  platforms.push(new Platforms(0, 200, 350, PLATFORM_HEIGHT));
-  platforms.push(new Platforms(350, height - 100, 300, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(0, height - PLATFORM_HEIGHT, width * 21, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(350, height - 100, 285, PLATFORM_HEIGHT));
   platforms.push(new Platforms(800, 800, 300, PLATFORM_HEIGHT));
-  platforms.push(new Platforms(350, height - 400, 300, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(360, height - 450, 185, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(700, 430, 200, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(935, 430 - PLATFORM_HEIGHT, 300, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(200, 250, 250, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(1500, 600, 240, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(2000, 430, 300, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(2500, 600, 200, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(1750, 350, 100, PLATFORM_HEIGHT));
+  platforms.push(new Platforms(1500, 225, 240, PLATFORM_HEIGHT));
 
   coinImg = new Coin(coin, 75, 100, 2.75);
   textFont(gameFont);
@@ -83,7 +91,7 @@ function draw() {
   textSize(18);
   text(`x: ${mouseX} y: ${mouseY}`, 10, 25);
 
-  camX = width / 10 - player.x; //calculating the required camera shift. This offsets the world so the player remains visually centered or fixed.
+  camX = width / 2 - player.x; //calculating the required camera shift. This offsets the world so the player remains visually centered or fixed.
 
   //apply camX using translate()
   push();
