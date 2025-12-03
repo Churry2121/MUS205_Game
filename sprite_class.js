@@ -56,7 +56,7 @@ class Enemy {
     this.x = x;
     this.y = y;
 
-    this.velocityX = 1;
+    this.velocityX = 1.5;
     this.velocityY = 0;
     this.gravity = 2;
 
@@ -118,7 +118,7 @@ class Enemy {
 
     pop();
 
-    this.frame += 0.08;
+    this.frame += 0.15;
     if (this.frame >= this.total_frames) {
       this.frame = 0;
     }
