@@ -7,7 +7,8 @@ let platforms = [];
 let jumpKey = false;
 let coin, coinImg;
 let bg, gameFont, camX;
-let tileset;
+let tileset, enemyImg, enemy;
+
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
 
@@ -50,7 +51,7 @@ function preload() {
   }
 
   tileset = loadImage('asset/tileset2.png');
-
+  enemyImg = loadImage('asset/slime/slime_idlev2.png');
   bg = loadImage('asset/bg/castle_ruins.jpg');
   coin = loadImage('asset/coin.png');
   gameFont = loadFont('asset/ByteBounce.ttf');
@@ -64,6 +65,8 @@ function setup() {
     playerFramesRun, playerFramesRun2, 
     playerFramesAttack, playerFramesAttack2,
     50, 10, 3);
+
+  enemy = new Enemy(enemyImg, 400, 400, 2.5);
 
   platforms.push(new Platforms(0, 200, 350, PLATFORM_HEIGHT));
   platforms.push(new Platforms(350, height - 100, 300, PLATFORM_HEIGHT));
@@ -87,6 +90,7 @@ function draw() {
   translate(camX, 0);
   
   player.update(platforms);
+  enemy.update();
 
   for (let p of platforms){ //show platforms
     p.display();
