@@ -7,7 +7,8 @@ let platforms = [];
 let jumpKey = false;
 let coin, coinImg;
 let bg, gameFont, camX;
-let tileset, enemyImg, enemy;
+let tileset, enemyImg;
+let enemy;
 
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
@@ -66,7 +67,7 @@ function setup() {
     playerFramesAttack, playerFramesAttack2,
     50, height - 400, 3);
 
-  enemy = new Enemy(enemyImg, 400, 400, 2.5);
+  enemy = new Enemy(enemyImg, 800, 765, 2.75);
 
   platforms.push(new Platforms(0, height - PLATFORM_HEIGHT, width * 21, PLATFORM_HEIGHT));
   platforms.push(new Platforms(350, height - 100, 285, PLATFORM_HEIGHT));
@@ -99,6 +100,7 @@ function draw() {
   
   player.update(platforms);
   enemy.update();
+  // enemyMovement();
 
   for (let p of platforms){ //show platforms
     p.display();
@@ -131,3 +133,12 @@ function keyReleased() {
     player.is_attacking = false; //stops animation when the key is released
   }
 }
+
+// function enemyMovement(){
+//   enemy.x += enemy.velocityX;
+//   if (enemy.x > platforms.w + 100){
+//     enemy.velocityX *= -1;
+//   } else if (enemy.x < platforms.w - 100){
+//     enemy.velocityX *= -1;
+//   }
+// }
