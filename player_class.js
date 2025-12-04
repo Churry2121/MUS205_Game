@@ -30,7 +30,7 @@ class Player {
     this.total_frames_attack = attackLeft1.length;
     this.direction = 1; // 1 = right, -1 = left
 
-    this.velocityX = 15;
+    this.velocityX = 13;
     this.velocityY = 0;
     this.gravity = 2;
 
