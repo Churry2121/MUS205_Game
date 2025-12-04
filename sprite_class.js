@@ -62,7 +62,7 @@ class Enemy {
 
     // Fixed: Assign the parameter to the property
     this.initialX = x;
-    this.walkRange = walkRange; // This was the bug!
+    this.walkRange = walkRange;
     this.minX = this.initialX;
     this.maxX = this.initialX + this.walkRange;
 
