@@ -14,7 +14,7 @@ class Player {
     this.scl = scl;
 
     let baseHeight = framesLeft[0].height * this.scl;
-    this.w = baseHeight * 1.5;
+    this.w = (baseHeight * 1.5) * 0.9;
     this.h = baseHeight;
 
     // Add collision box offsets (adjust these values to fit your sprite)
@@ -73,22 +73,26 @@ class Player {
     let collisionRight = collisionX + this.collisionWidth;
     let collisionBottom = collisionY + this.collisionHeight;
     
-    // AABB collision detection with adjusted collision box
-    if (collisionX < platform.x + platform.w &&
+    //extend platform to the right to extend collision box
+    let platformExtension = 22;
+    let extendedPlatformWidth = platform.w + platformExtension;
+    
+    // AABB collision detection with extended platform width
+    if (collisionX < platform.x + extendedPlatformWidth &&
         collisionRight > platform.x &&
         collisionY < platform.y + platform.h &&
         collisionBottom > platform.y) {
 
-      // Calculate overlaps using collision box - distance of penetration
-      let overlapLeft = collisionRight - platform.x;  // How far we've penetrated from the left
-      let overlapRight = (platform.x + platform.w) - collisionX;  // How far we've penetrated from the right
-      let overlapTop = collisionBottom - platform.y;  // How far we've penetrated from the top
-      let overlapBottom = (platform.y + platform.h) - collisionY;  // How far we've penetrated from the bottom
+      // Calculate overlaps using collision box
+      let overlapLeft = collisionRight - platform.x;
+      let overlapRight = (platform.x + extendedPlatformWidth) - collisionX; // Use extended width
+      let overlapTop = collisionBottom - platform.y;
+      let overlapBottom = (platform.y + platform.h) - collisionY;
 
       let minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
       
       if (minOverlap === overlapTop && this.velocityY > 0) {
-        // Landing on top - adjust main position, not collision box position
+        // Landing on top
         this.y = platform.y - this.collisionOffsetY - this.collisionHeight;
         this.velocityY = 0;
         this.isGrounded = true;
@@ -98,11 +102,11 @@ class Player {
         this.y = platform.y + platform.h - this.collisionOffsetY;
         this.velocityY = 0;
       } else if (minOverlap === overlapLeft) {
-        // Hitting the left side of platform (player moving right)
+        // Hitting the left side
         this.x = platform.x - this.collisionOffsetX - this.collisionWidth;
       } else if (minOverlap === overlapRight) {
-        // Hitting the right side of platform (player moving left)
-        this.x = platform.x + platform.w - this.collisionOffsetX;
+        // Hitting the right side - use extended width
+        this.x = platform.x + extendedPlatformWidth - this.collisionOffsetX;
       }    
     }
   }
