@@ -1,4 +1,4 @@
-let player, points;
+let player;
 let playerFramesIdle1 = [], playerFramesIdle2 = [];
 let playerFramesJump1 = [], playerFramesJump2 = [];
 let playerFramesRun = [], playerFramesRun2 = [];
@@ -8,7 +8,9 @@ let jumpKey = false;
 let coin, coin1, coin2, coin3, coinImg;
 let bg, gameFont, camX;
 let tileset, enemyImg;
-let enemy, enemy1, enemy2, enemy3;
+let enemies = [];
+let points = 0;
+
 
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
@@ -61,18 +63,17 @@ function preload() {
 function setup() {
   createCanvas(1880, windowHeight);
 
-  pointSystem();
-
   player = new Player(playerFramesIdle1, playerFramesIdle2, 
     playerFramesJump1, playerFramesJump2, 
     playerFramesRun, playerFramesRun2, 
     playerFramesAttack, playerFramesAttack2,
     50, height - 400, 3);
 
-  enemy = new Enemy(enemyImg, 800, 765, 2.75);
-  enemy1 = new Enemy(enemyImg, 700, 400, 2.75, 225);
-  enemy2 = new Enemy(enemyImg, 1500, 565, 2.75, 200);
-  enemy3 = new Enemy(enemyImg, 2500, 565, 2.75, 250);
+  enemies.push(new Enemy(enemyImg, 800, 765, 2.75, 325)); // Ground enemy
+  enemies.push(new Enemy(enemyImg, 700, 400, 2.75, 225)); // Platform enemy
+  enemies.push(new Enemy(enemyImg, 1500, 565, 2.75, 200));
+  enemies.push(new Enemy(enemyImg, 2500, 565, 2.75, 250));
+
 
   platforms.push(new Platforms(0, height - PLATFORM_HEIGHT, width * 21, PLATFORM_HEIGHT));
   platforms.push(new Platforms(350, height - 100, 275, PLATFORM_HEIGHT));
@@ -96,10 +97,11 @@ function setup() {
 
 function draw() {
   background(bg);
+
   fill('#964B00');
   textSize(28);
-  text(`Points: ${points}`, 25, 25);
-  text(`WASD; Hold J to Attack`, 25, 50);
+  text(`Points: ${points}`, 65, 75);
+  text(`WASD; Hold J to Attack`, 65, 100);
 
   camX = width / 2 - player.x; //calculating the required camera shift. This offsets the world so the player remains visually centered or fixed.
 
@@ -109,14 +111,21 @@ function draw() {
   
   player.update(platforms);
 
-  enemy.update();
-  enemy1.update();
-  enemy2.update();
-  enemy3.update();
-  // enemyMovement();
+  for (let e of enemies){
+    e.update();
+  }
 
   for (let p of platforms){ //show platforms
     p.display();
+  }
+
+  let isEnemyColliding = checkEnemyCollision(player, enemies);
+
+  if (isEnemyColliding){
+    points--;
+    console.log('collision');
+  } else {
+    console.log('phew!');
   }
   
   coin.draw();
@@ -124,10 +133,6 @@ function draw() {
   coin2.draw(); 
   coin3.draw();
   pop();
-}
-
-function windowResize() {
-  resizeCanvas(windowWidth, windowHeight);
 }
 
 function keyPressed() {
@@ -150,15 +155,16 @@ function keyReleased() {
   }
 }
 
-function pointSystem(){
-  points = 0
+function checkEnemyCollision(player, enemies){
+  for (let enemy of enemies){
+    //check if player collides with enemy
+    if (player.x < enemy.x + enemy.w &&
+      player.x + player.w > enemy.x &&
+      player.y < enemy.y + enemy.h &&
+      player.y + player.h > enemy.y
+    ) {
+      return true; //collision detected
+    }
+  }
+  return false; //no collision
 }
-
-// function enemyMovement(){
-//   enemy.x += enemy.velocityX;
-//   if (enemy.x > platforms.w + 100){
-//     enemy.velocityX *= -1;
-//   } else if (enemy.x < platforms.w - 100){
-//     enemy.velocityX *= -1;
-//   }
-// }
