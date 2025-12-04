@@ -11,6 +11,8 @@ let tileset, enemyImg;
 let enemies = [];
 let points = 0, health = 100, maxHealth = 100;
 let canTakeDamage = true;
+let canAttack = true;
+let attackCooldown = 500; //2 seconds between attacks 
 
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
@@ -111,8 +113,6 @@ function draw() {
   push();
   translate(camX, 0);
   
-  player.update(platforms);
-
   for (let e of enemies){
     e.update();
   }
@@ -125,7 +125,10 @@ function draw() {
     p.display();
   }
 
+  checkAttackCollision(player, enemies);
+
   let isEnemyColliding = checkEnemyCollision(player, enemies);
+  checkCoinCollision(player, coins);
 
   if (isEnemyColliding && canTakeDamage){
     health -= 10;
@@ -145,6 +148,44 @@ function draw() {
     console.log('phew!');
   }
 
+  player.update(platforms);
+
+  //collision box
+  // stroke(0, 255, 0); // Green
+  // noFill();
+  // strokeWeight(2);
+
+  // rect(player.x + player.collisionOffsetX, 
+  //    player.y + player.collisionOffsetY, 
+  //    player.collisionWidth, 
+  //    player.collisionHeight);
+
+  // if (player.is_attacking) {
+  //   stroke(255, 0, 255); // Purple/Magenta
+  //   let attackRange = 80;
+  //   let attackX = player.direction === 1 
+  //     ? player.x + player.collisionOffsetX + player.collisionWidth
+  //     : player.x + player.collisionOffsetX - attackRange;
+  //   rect(attackX, player.y + player.collisionOffsetY, attackRange, player.collisionHeight);
+  // }
+
+
+  // // Draw enemy collision boxes
+  // stroke(255, 0, 0); // Red
+  // for (let e of enemies) {
+  //   rect(e.x, e.y, e.w, e.h);
+  // }
+
+  // for (let p of platforms){ //draw plat collision box
+  //   rect(p.x, p.y, p.w, p.h);
+  // }
+
+  // // Draw coin collision boxes
+  // stroke(255, 255, 0); // Yellow
+  // for (let c of coins) {
+  //   rect(c.x, c.y, c.h * c.scl, c.h * c.scl);
+  // }
+
   pop();
 }
 
@@ -155,6 +196,10 @@ function keyPressed() {
 
   if (key === 'j' || key === 'J'){
     player.is_attacking = true; //attacking
+
+    setTimeout(() => {
+      canAttack = true;
+    }, attackCooldown);
   }
 }
 
@@ -168,23 +213,108 @@ function keyReleased() {
   }
 }
 
-function checkEnemyCollision(player, enemies){
-  for (let enemy of enemies){
-    //check if player collides with enemy
-    if (player.x < enemy.x + enemy.w &&
-      player.x + player.w > enemy.x &&
-      player.y < enemy.y + enemy.h &&
-      player.y + player.h > enemy.y
+function checkAttackCollision(player, enemies) {
+  if (!player.is_attacking || !canAttack) return;
+  
+  let attackRange = 80;
+  let attackHeight = player.collisionHeight;
+  
+  let attackX = player.direction === 1 
+    ? player.x + player.collisionOffsetX + player.collisionWidth
+    : player.x + player.collisionOffsetX - attackRange;
+  
+  let attackY = player.y + player.collisionOffsetY;
+  
+  let hitEnemy = false;
+  
+  // Loop backwards to safely remove enemies
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    let enemy = enemies[i];
+    let enemyCollisionX = enemy.x + enemy.collisionOffsetX;
+    let enemyCollisionY = enemy.y + enemy.collisionOffsetY;
+    
+    if (attackX < enemyCollisionX + enemy.collisionWidth &&
+        attackX + attackRange > enemyCollisionX &&
+        attackY < enemyCollisionY + enemy.collisionHeight &&
+        attackY + attackHeight > enemyCollisionY
     ) {
-      return true; //collision detected
+      // Deal 1 damage to enemy
+      let isDead = enemy.takeDamage(1);
+      
+      if (isDead) {
+        enemies.splice(i, 1); // Remove if dead
+        points += 50;
+        console.log('Enemy killed! Points:', points);
+      } else {
+        console.log('Enemy hit! Health:', enemy.health);
+      }
+      
+      hitEnemy = true;
     }
   }
-  return false; //no collision
+  
+  if (hitEnemy) {
+    canAttack = false;
+    setTimeout(() => {
+      canAttack = true;
+    }, attackCooldown);
+  }
+}
+
+function checkEnemyCollision(player, enemies){
+  // Calculate player's actual collision box
+  let playerCollisionX = player.x + player.collisionOffsetX;
+  let playerCollisionY = player.y + player.collisionOffsetY;
+  let playerCollisionRight = playerCollisionX + player.collisionWidth;
+  let playerCollisionBottom = playerCollisionY + player.collisionHeight;
+  
+  for (let enemy of enemies){
+    // Calculate enemy's actual collision box
+    let enemyCollisionX = enemy.x + enemy.collisionOffsetX;
+    let enemyCollisionY = enemy.y + enemy.collisionOffsetY;
+    let enemyCollisionRight = enemyCollisionX + enemy.collisionWidth;
+    let enemyCollisionBottom = enemyCollisionY + enemy.collisionHeight;
+    
+    // Check if collision boxes overlap
+    if (playerCollisionX < enemyCollisionRight && // Player's LEFT < Enemy's RIGHT
+        playerCollisionRight > enemyCollisionX && // Player's RIGHT > Enemy's LEFT
+        playerCollisionY < enemyCollisionBottom && // Player's TOP < Enemy's BOTTOM
+        playerCollisionBottom > enemyCollisionY    // Player's BOTTOM > Enemy's TOP
+    ) {
+      return true; // collision detected
+    }
+  }
+  return false; // no collision
+}
+
+function checkCoinCollision(player, coins){
+  // Calculate player's actual collision box
+  let playerCollisionX = player.x + player.collisionOffsetX;
+  let playerCollisionY = player.y + player.collisionOffsetY;
+  let playerCollisionRight = playerCollisionX + player.collisionWidth;
+  let playerCollisionBottom = playerCollisionY + player.collisionHeight;
+  
+  // Loop backwards to safely remove coins
+  for (let i = coins.length - 1; i >= 0; i--) {
+    let coin = coins[i];
+    let coinSize = coin.h * coin.scl;
+    
+    // Check if player collision box overlaps with coin
+    if (playerCollisionX < coin.x + coinSize &&
+        playerCollisionRight > coin.x &&
+        playerCollisionY < coin.y + coinSize &&
+        playerCollisionBottom > coin.y
+    ) {
+      coins.splice(i, 1); // Remove the coin from array
+      points += 10; // Add points
+      console.log('Coin collected! Points:', points);
+    }
+  }
 }
 
 function healthBar(health, maxHealth){
   strokeWeight(2);
-  fill('#964B00');
+  fill('#3e3a36ff');
   text('Health:', 65, 50);
 
   // Draw background (empty health bar)
