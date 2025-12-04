@@ -131,7 +131,7 @@ function draw() {
   checkCoinCollision(player, coins);
 
   if (isEnemyColliding && canTakeDamage){
-    health -= 10;
+    health -= 20;
     health = Math.max(0, health); //doesn't go below 0
     canTakeDamage = false;
 
@@ -143,6 +143,7 @@ function draw() {
 
     if (health <= 0){
       console.log('Game over!');
+      noLoop(); // Stop the game
     }
   } else {
     console.log('phew!');
@@ -187,6 +188,22 @@ function draw() {
   // }
 
   pop();
+
+  // Game over screen
+  if (health <= 0) {
+    fill(0, 0, 0, 200); // Dark overlay
+    rect(0, 0, width, height);
+    
+    fill(255, 0, 0);
+    textSize(80);
+    textAlign(CENTER, CENTER);
+    text('GAME OVER', width/2, height/2 - 50);
+    
+    fill(255);
+    textSize(40);
+    text('Refresh to Restart', width/2, height/2 + 50);
+    textAlign(LEFT, BASELINE); // Reset alignment
+  }
 }
 
 function keyPressed() {
@@ -243,7 +260,7 @@ function checkAttackCollision(player, enemies) {
       
       if (isDead) {
         enemies.splice(i, 1); // Remove if dead
-        points += 50;
+        points += 25;
         console.log('Enemy killed! Points:', points);
       } else {
         console.log('Enemy hit! Health:', enemy.health);
@@ -306,7 +323,7 @@ function checkCoinCollision(player, coins){
         playerCollisionBottom > coin.y
     ) {
       coins.splice(i, 1); // Remove the coin from array
-      points += 10; // Add points
+      points += 5; // Add points
       console.log('Coin collected! Points:', points);
     }
   }
@@ -314,7 +331,7 @@ function checkCoinCollision(player, coins){
 
 function healthBar(health, maxHealth){
   strokeWeight(2);
-  fill('#3e3a36ff');
+  fill('#964B00');
   text('Health:', 65, 50);
 
   // Draw background (empty health bar)
