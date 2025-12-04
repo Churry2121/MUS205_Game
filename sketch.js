@@ -12,7 +12,9 @@ let enemies = [];
 let points = 0, health = 100, maxHealth = 100;
 let canTakeDamage = true;
 let canAttack = true;
-let attackCooldown = 500; //2 seconds between attacks 
+let attackCooldown = 500; //2 seconds between attacks
+
+let coinSound, hurtSound, attackSound, bg_audio;
 
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
@@ -55,6 +57,11 @@ function preload() {
     playerFramesAttack2[i] = loadImage(`asset/Attack1_2/HeroKnight_Attack1_${i}.png`);
   }
 
+  bg_audio = loadSound('audio/SwitchWithMeTheme.wav');
+  coinSound = loadSound('audio/coin.wav');
+  hurtSound = loadSound('audio/hurt.wav');
+  attackSound = loadSound('audio/attack_sound.mp3');
+
   tileset = loadImage('asset/tileset2.png');
   enemyImg = loadImage('asset/slime/slime_idlev2.png');
   bg = loadImage('asset/bg/castle_ruins.jpg');
@@ -95,6 +102,14 @@ function setup() {
   coins.push(new Coin(coinImg, 1675, 165, 2.75));
   coins.push(new Coin(coinImg, 2100, 375, 2.75));
   textFont(gameFont);
+
+  if (bg_audio.isPlaying()){
+    bg_audio.stop();
+  } else{
+    bg_audio.setVolume(0.5);
+    bg_audio.play();
+    bg_audio.loop();
+  }
 }
 
 function draw() {
@@ -134,6 +149,8 @@ function draw() {
     health -= 20;
     health = Math.max(0, health); //doesn't go below 0
     canTakeDamage = false;
+
+    hurtSound.play();
 
     setTimeout(() => {
       canTakeDamage = true;
@@ -213,6 +230,7 @@ function keyPressed() {
 
   if (key === 'j' || key === 'J'){
     player.is_attacking = true; //attacking
+    attackSound.play();
 
     setTimeout(() => {
       canAttack = true;
@@ -324,6 +342,7 @@ function checkCoinCollision(player, coins){
     ) {
       coins.splice(i, 1); // Remove the coin from array
       points += 5; // Add points
+      coinSound.play();
       console.log('Coin collected! Points:', points);
     }
   }
