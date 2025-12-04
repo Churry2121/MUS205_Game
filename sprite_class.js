@@ -1,5 +1,5 @@
 class Platforms {
-  constructor(x, y, w, h) {
+  constructor(x, y, w, PLATFORM_HEIGHT) {
     this.x = x;
     this.y = y;
     this.w = w;
@@ -60,7 +60,6 @@ class Enemy {
     this.velocityY = 0;
     this.gravity = 2;
 
-    // Fixed: Assign the parameter to the property
     this.initialX = x;
     this.walkRange = walkRange;
     this.minX = this.initialX;
@@ -76,7 +75,25 @@ class Enemy {
     this.w = this.frameW * this.scl;
     this.h = this.frameH * this.scl;
 
-    this.direction = 1; // 1 for right, -1 for left 
+    // Collision box
+    this.collisionOffsetX = this.w * 0.2;
+    this.collisionOffsetY = this.h * 0.1;
+    this.collisionWidth = this.w * 0.6;
+    this.collisionHeight = this.h * 0.8;
+
+    // TIGHTER COLLISION BOX - Adjust these values
+    this.collisionOffsetX = this.w * 0.3;  // Move 25% from left (was 0.2)
+    this.collisionOffsetY = this.h * 0.2;  // Move 15% from top (was 0.1)
+    this.collisionWidth = this.w * 0.55;     // 50% of width (was 0.6)
+    this.collisionHeight = this.h * 0.75;    // 70% of height (was 0.8)
+
+
+    // Health system
+    this.health = 2; // Takes 2 hits to kill
+    this.maxHealth = 2;
+    this.isHurt = false; // For visual feedback
+
+    this.direction = 1;
     this.frame = 0;
   }
 
@@ -99,6 +116,11 @@ class Enemy {
   draw() {
     push();
     
+    // Flash red when hurt
+    if (this.isHurt) {
+      tint(255, 100, 100);
+    }
+    
     // Flip sprite based on direction
     if (this.direction === -1) {
       translate(this.x + this.w, this.y);
@@ -116,11 +138,44 @@ class Enemy {
     image(this.sheet, this.x, this.y, this.w, this.h, 
           sx, sy, this.frameW, this.frameH);
 
+    noTint();
     pop();
+
+    // Draw health bar above enemy
+    this.drawHealthBar();
 
     this.frame += 0.15;
     if (this.frame >= this.total_frames) {
       this.frame = 0;
     }
+  }
+
+  drawHealthBar() {
+    let barWidth = this.w;
+    let barHeight = 5;
+    let barX = this.x;
+    let barY = this.y - 10; // Above enemy
+
+    // Background (empty health)
+    fill(50);
+    noStroke();
+    rect(barX, barY, barWidth, barHeight);
+
+    // Current health
+    let healthWidth = (this.health / this.maxHealth) * barWidth;
+    fill(255, 0, 0); // Red
+    rect(barX, barY, healthWidth, barHeight);
+  }
+
+  takeDamage(amount) {
+    this.health -= amount;
+    this.isHurt = true;
+    
+    // Reset hurt flash after 200ms
+    setTimeout(() => {
+      this.isHurt = false;
+    }, 200);
+    
+    return this.health <= 0; // Return true if dead
   }
 }
