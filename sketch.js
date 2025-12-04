@@ -5,12 +5,12 @@ let playerFramesRun = [], playerFramesRun2 = [];
 let playerFramesAttack = [], playerFramesAttack2 = [];
 let platforms = [];
 let jumpKey = false;
-let coin, coin1, coin2, coin3, coinImg;
+let coins = [];
 let bg, gameFont, camX;
 let tileset, enemyImg;
 let enemies = [];
-let points = 0;
-
+let points = 0, health = 100, maxHealth = 100;
+let canTakeDamage = true;
 
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
@@ -88,10 +88,10 @@ function setup() {
   platforms.push(new Platforms(1750, 350, 100, PLATFORM_HEIGHT));
   platforms.push(new Platforms(1500, 225, 240, PLATFORM_HEIGHT));
 
-  coin = new Coin(coinImg, 325, 200, 2.75);
-  coin1 = new Coin(coinImg, 1250, 325, 2.75);
-  coin2 = new Coin(coinImg, 1675, 165, 2.75);
-  coin3 = new Coin(coinImg, 2100, 375, 2.75);
+  coins.push(new Coin(coinImg, 325, 200, 2.75));
+  coins.push(new Coin(coinImg, 1250, 325, 2.75));
+  coins.push(new Coin(coinImg, 1675, 165, 2.75));
+  coins.push(new Coin(coinImg, 2100, 375, 2.75));
   textFont(gameFont);
 }
 
@@ -99,9 +99,11 @@ function draw() {
   background(bg);
 
   fill('#964B00');
-  textSize(28);
+  textSize(30);
   text(`Points: ${points}`, 65, 75);
   text(`WASD; Hold J to Attack`, 65, 100);
+
+  healthBar(health, maxHealth);
 
   camX = width / 2 - player.x; //calculating the required camera shift. This offsets the world so the player remains visually centered or fixed.
 
@@ -115,23 +117,34 @@ function draw() {
     e.update();
   }
 
+  for (let c of coins){
+    c.draw();
+  }
+
   for (let p of platforms){ //show platforms
     p.display();
   }
 
   let isEnemyColliding = checkEnemyCollision(player, enemies);
 
-  if (isEnemyColliding){
-    points--;
-    console.log('collision');
+  if (isEnemyColliding && canTakeDamage){
+    health -= 10;
+    health = Math.max(0, health); //doesn't go below 0
+    canTakeDamage = false;
+
+    setTimeout(() => {
+      canTakeDamage = true;
+    }, 1000); //1 second cooldown
+
+    console.log('collision', health);
+
+    if (health <= 0){
+      console.log('Game over!');
+    }
   } else {
     console.log('phew!');
   }
-  
-  coin.draw();
-  coin1.draw();
-  coin2.draw(); 
-  coin3.draw();
+
   pop();
 }
 
@@ -167,4 +180,32 @@ function checkEnemyCollision(player, enemies){
     }
   }
   return false; //no collision
+}
+
+function healthBar(health, maxHealth){
+  strokeWeight(2);
+  fill('#964B00');
+  text('Health:', 65, 50);
+
+  // Draw background (empty health bar)
+  fill(50);
+  stroke(0);
+  strokeWeight(2);
+  rect(150, 30, 200, 20);
+  
+  // Draw current health
+  noStroke();
+  
+  // Color based on health percentage
+  if (health > 60) {
+    fill(0, 255, 0); // Green
+  } else if (health > 30) {
+    fill(255, 165, 0); // Orange
+  } else {
+    fill(255, 0, 0); // Red
+  }
+  
+  // Map health to bar width (not height!)
+  let healthWidth = map(health, 0, maxHealth, 0, 200);
+  rect(150, 30, healthWidth, 20); // width changes, height stays 20
 }
