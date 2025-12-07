@@ -56,7 +56,7 @@ class Enemy {
     this.x = x;
     this.y = y;
 
-    this.velocityX = 1.5;
+    this.velocityX = 1.75;
     this.velocityY = 0;
     this.gravity = 2;
 
@@ -82,10 +82,10 @@ class Enemy {
     this.collisionHeight = this.h * 0.8;
 
     // TIGHTER COLLISION BOX - Adjust these values
-    this.collisionOffsetX = this.w * 0.3;  // Move 25% from left (was 0.2)
-    this.collisionOffsetY = this.h * 0.2;  // Move 15% from top (was 0.1)
-    this.collisionWidth = this.w * 0.55;     // 50% of width (was 0.6)
-    this.collisionHeight = this.h * 0.75;    // 70% of height (was 0.8)
+    this.collisionOffsetX = this.w * 0.3;  
+    this.collisionOffsetY = this.h * 0.2;  
+    this.collisionWidth = this.w * 0.55;   
+    this.collisionHeight = this.h * 0.75; 
 
 
     // Health system
