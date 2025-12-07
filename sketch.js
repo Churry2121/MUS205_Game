@@ -12,23 +12,23 @@ let enemies = [];
 let points = 0, health = 100, maxHealth = 100;
 let canTakeDamage = true;
 let canAttack = true;
-let attackCooldown = 500; //2 seconds between attacks
+let attackCooldown = 1000; 
 
 let coinSound, hurtSound, attackSound, bg_audio;
 
 const TILE_SIZE_W_SOURCE = 32; //The dimensions of a single block
 const TILE_SIZE_H_SOURCE = 16;
 
-// Destination Size (The size you want it to appear on the canvas)
-const TILE_SCALE = 2; // Scale factor (e.g., 2 for double size)
-const TILE_SIZE_W_DEST = TILE_SIZE_W_SOURCE * TILE_SCALE * 1.5; // 32 * 2 = 64
-const PLATFORM_HEIGHT = TILE_SIZE_H_SOURCE * TILE_SCALE * 1.5;   // 16 * 2 = 32
+const TILE_SCALE = 2; // Scale factor  
+const TILE_SIZE_W_DEST = TILE_SIZE_W_SOURCE * TILE_SCALE * 1.5;  
+const PLATFORM_HEIGHT = TILE_SIZE_H_SOURCE * TILE_SCALE * 1.5;  
 
-let platformTileX = 16; //X:~64 (where the single blocks start)
-let platformTileY = 48; //Y: ~16 (the start of the second block)
+let platformTileX = 16; 
+let platformTileY = 48;  
 
 
 function preload() {
+  //Animation
   for (let i = 0; i < 8; i++){
     playerFramesIdle1[i] = loadImage(`asset/Idle/HeroKnight_Idle_${i}.png`);
   }
@@ -262,7 +262,7 @@ function checkAttackCollision(player, enemies) {
   
   let hitEnemy = false;
   
-  // Loop backwards to safely remove enemies
+  // Loop backwards to remove enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
     let enemy = enemies[i];
     let enemyCollisionX = enemy.x + enemy.collisionOffsetX;
@@ -277,7 +277,7 @@ function checkAttackCollision(player, enemies) {
       let isDead = enemy.takeDamage(1);
       
       if (isDead) {
-        enemies.splice(i, 1); // Remove if dead
+        enemies.splice(i, 1); //remove if dead
         points += 25;
         console.log('Enemy killed! Points:', points);
       } else {
@@ -323,13 +323,13 @@ function checkEnemyCollision(player, enemies){
 }
 
 function checkCoinCollision(player, coins){
-  // Calculate player's actual collision box
+  //calculate player's collision boxe
   let playerCollisionX = player.x + player.collisionOffsetX;
   let playerCollisionY = player.y + player.collisionOffsetY;
   let playerCollisionRight = playerCollisionX + player.collisionWidth;
   let playerCollisionBottom = playerCollisionY + player.collisionHeight;
   
-  // Loop backwards to safely remove coins
+  // Loop backwards to remove coins
   for (let i = coins.length - 1; i >= 0; i--) {
     let coin = coins[i];
     let coinSize = coin.h * coin.scl;
