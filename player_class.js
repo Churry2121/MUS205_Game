@@ -18,10 +18,10 @@ class Player {
     this.h = baseHeight;
 
     // Add collision box offsets (adjust these values to fit your sprite)
-    this.collisionOffsetX = this.w * 0.3;  // Offset from left edge
-    this.collisionOffsetY = this.h * 0.1;  // Offset from top edge
-    this.collisionWidth = this.w * 0.4;    // Actual collision box width
-    this.collisionHeight = this.h * 0.8;   // Actual collision box height
+    this.collisionOffsetX = this.w * 0.3;  //offset from left edge
+    this.collisionOffsetY = this.h * 0.1;  //offset from top edge
+    this.collisionWidth = this.w * 0.4;    //collision box width
+    this.collisionHeight = this.h * 0.8;   //collision box height
 
     this.frame = 0;
     this.total_frames_idle = framesRight.length;
@@ -38,7 +38,7 @@ class Player {
     this.is_attacking = false;
     this.jump_power = -28.5;
     this.isGrounded = false;
-    this.ground_level = height - 200; // Match platform height
+    this.ground_level = height - 200;  
     this.lastAnimationState = null; // Track animation state
   }
 
@@ -187,7 +187,7 @@ class Player {
     let displaySize = img.height * this.scl;
     image(img, this.x, this.y, displaySize * 1.5, displaySize);
 
-    this.frame += 0.3;
+    this.frame += 0.2;
     if (this.frame >= this.total_frames_attack){
       this.frame = 0;
     }
